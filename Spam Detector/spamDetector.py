@@ -1,28 +1,63 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.ensemble import AdaBoostClassifier
+from wordcloud import WordCloud
+from matplotlib import pyplot as plt
 
-data = pd.read_csv('spambase.data').as_matrix()
+#avoiding unknown text error
+df = pd.read_csv('spam.csv' , encoding='ISO-8859-1')
 
-np.random.shuffle(data)
+#drop columns not needed
+df = df.drop(['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], axis = 1)
 
-#Dataset
-X= data[:, :48]
-Y= data[:, -1]
+#rename columns
+df.columns = ['labels', 'data']
 
-#Division of dataset
-Xtrain = X[:-100,]
-Ytrain = Y[:-100,]
-Xtest = X[-100:,]
-Ytest = Y[-100:,]
+df['b_labels'] = df['labels'].map({'ham':0 , 'spam':1})
+# defining output
 
-#fitting the model 1 --- Naive Bayes Classifier
+Y = df['b_labels'].as_matrix()
+
+#tfidf = TfidfVectorizer(decode_error = 'ignore')
+#X = tfidf.fit_transform(df['data'])
+count_vect = CountVectorizer(decode_error= 'ignore')
+X = count_vect.fit_transform(df['data'])
+
+Xtrain, Xtest, Ytrain, Ytest = train_test_split(X, Y, test_size= 0.33)
+
 model = MultinomialNB()
 model.fit(Xtrain, Ytrain)
-print ("Classification rate for NB:", model.score(Xtest, Ytest))
 
-#fitting the model 2 --- AdaBoost Classifier
-model1 = AdaBoostClassifier()
-model.fit(Xtrain, Ytrain)
-print ("Classification rate for Adaboost:", model.score(Xtest, Ytest))
+print('train score: ', model.score(Xtrain, Ytrain))
+print('test score: ', model.score(Xtest, Ytest))
+
+#visualize the data
+def visualize(label):
+    words = ''
+    for msg in df[df['labels'] == label]['data']:
+        msg = msg.lower()
+        words += msg + ' '
+    wordcloud = WordCloud(width = 600, height=400).generate(words)
+    plt.imshow(wordcloud)
+    plt.axis('off')
+    plt.show()
+
+visualize('spam')
+visualize('ham')
+
+#analysis of model showing its short comings
+df['predictions'] = model.predict(X)
+
+sneaked_spam = df[(df['predictions'] == 0) & (df['b_labels'] == 1)]['data']
+
+#spam must items
+for msg in sneak_spam:
+    print(msg)
+
+not_actual_spam = df[(df['predictions'] == 1) & (df['b_labels'] == 0)]['data']
+
+#not spam items
+for msg1 in not_actual_spam:
+    print(msg1)
