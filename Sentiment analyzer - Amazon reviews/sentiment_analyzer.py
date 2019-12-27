@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jun  6 17:58:51 2018
-@author: Prashita
-"""
+
+#Importing libraries
 
 import nltk
 import numpy as np
@@ -11,8 +8,6 @@ from nltk.stem import WordNetLemmatizer
 from sklearn.linear_model import LogisticRegression
 from bs4 import BeautifulSoup
 from sklearn.naive_bayes import MultinomialNB
-
-#data= pd.read_csv('https://github.com/lazyprogrammer/machine_learning_examples/blob/master/nlp_class/spambase.data').as_matrix()
 
 wordnet_lemm = WordNetLemmatizer()
 
@@ -27,6 +22,7 @@ negative_reviews = negative_reviews.findAll('review_text')
 np.random.shuffle(positive_reviews)
 positive_reviews = positive_reviews[:len(negative_reviews)]
 
+#Defining tokenizer function for text processing
 def my_tokenizer(s):
     s= s.lower()
     tokens = nltk.tokenize.word_tokenize(s)
@@ -41,6 +37,7 @@ current_index = 0
 positive_tokenized = []
 negative_tokenized = []
 
+#Vocabulary for positive reviews
 for review in positive_reviews:
     tokens = my_tokenizer(review.text)
     positive_tokenized.append(tokens)
@@ -49,7 +46,7 @@ for review in positive_reviews:
             word_index_map[token] = current_index
             current_index+=1
 
-
+#Vocabulary for negative reviews
 for review in negative_reviews:
     tokens = my_tokenizer(review.text)
     negative_tokenized.append(tokens)
@@ -69,6 +66,7 @@ def tokens_to_vector(tokens, label):
 
 N = len(positive_tokenized) + len(negative_tokenized)
 
+#Building the training data
 data = np.zeros((N, len(word_index_map) + 1))
 
 i = 0
@@ -92,6 +90,7 @@ Ytrain = Y[:-100, ]
 Xtest = X[-100:, ]
 Ytest = Y[-100:,]
 
+#Using logistic regression to classify the data 
 model = LogisticRegression()
 model.fit(Xtrain, Ytrain)
 print ("CLassification rate: ", model.score(Xtest, Ytest))
