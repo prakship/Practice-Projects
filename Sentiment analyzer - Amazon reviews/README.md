@@ -1,1 +1,1 @@
-This project involves the classification of reviews of an electonics product.
+This project involves the classification of reviews of an electronics product.
