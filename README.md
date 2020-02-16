@@ -2,6 +2,8 @@
 
 (a) Iris classification
 
+(b) Digit image classification using KNN algorithm
+
 Note : Will be adding more projects soon. I am still building my portfolio and will be gradually uploading mini-projects as I complete them in a structured manner. My plan is to start with beginner level projects then move on to more complicated ones. This repository will have three main folders :
 
 1. Beginner mini-projects
